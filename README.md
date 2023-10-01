@@ -1,5 +1,6 @@
 # Excel_Dashboard_Pizza_Sales
 **Dashboard**
+*Feel free to open the excel file for the interactive dashboard*
 
 ![Portfolio Projects 1- Excel Pizza Sales](https://github.com/ZaimAzmi/Excel_Dashboard_Pizza_Sales/assets/76802526/3d0c8a3b-c942-4970-af87-12967b73bd3b)
 
