@@ -1,0 +1,101 @@
+SELECT *fROM [pizza_sales excel file]
+--total revenue
+SELECT SUM(total_price) AS "Total_Revenue" FROM [pizza_sales excel file]
+
+--average order value
+SELECT SUM(total_price)/COUNT(DISTINCT order_id) AS "Avg_order_Value" FROM [pizza_sales excel file]
+
+--total pizza sold
+SELECT SUM(quantity) AS Total_pizza_sold FROM [pizza_sales excel file]
+
+--total order
+SELECT COUNT(DISTINCT order_id) AS Total_order FROM [pizza_sales excel file]
+--almost for each and every order more than two pizzas are sold
+
+--average pizzas per order
+SELECT CAST(CAST(SUM(quantity) AS decimal(10,2))/CAST(COUNT(DISTINCT order_id)AS decimal(10,2)) AS decimal(10,2))
+AS Avg_pizzas_per_order 
+FROM [pizza_sales excel file]
+--The use of CAST functions in this query ensures that the calculations 
+--and the final result are expressed as decimal numbers with two decimal places
+
+--daily order trend
+SELECT DATENAME(DW,order_date) AS order_day, COUNT(DISTINCT order_id) AS total_orders
+FROM [pizza_sales excel file]
+GROUP BY DATENAME(DW,order_date)
+--calculates the total number of distinct orders for each day of the week (e.g., Monday, Tuesday) based on the "order_date" column
+--The result is grouped by the day of the week using DATENAME(DW, order_date) to extract the day names, and then counts the number of distinct order IDs for each day.
+
+--hourly order trend
+SELECT DATEPART(HOUR,order_time) AS order_hours, COUNT(DISTINCT order_id) AS total_orders
+FROM [pizza_sales excel file]
+GROUP BY DATEPART(HOUR,order_time)
+ORDER BY DATEPART(HOUR,order_time)
+
+
+--percentage of revenue for each pizza category
+SELECT pizza_category, 
+	SUM(total_price) AS total_revenue,
+	CAST(SUM(total_price)*100/
+		(SELECT SUM(total_price) FROM [pizza_sales excel file] ) AS decimal (10,2))  AS PCT 
+FROM [pizza_sales excel file]
+GROUP BY pizza_category
+
+
+--percentage of revenue for each pizza category for january
+SELECT pizza_category, 
+	SUM(total_price) AS total_revenue,
+	CAST(SUM(total_price)*100/
+		(SELECT SUM(total_price) FROM [pizza_sales excel file] WHERE MONTH(order_date) = 1) AS decimal (10,2))  AS PCT 
+FROM [pizza_sales excel file]
+WHERE MONTH(order_date) = 1
+GROUP BY pizza_category
+
+--percentage of revenue for each pizza size
+SELECT pizza_size, 
+	CAST(SUM(total_price) AS decimal(10,2)) AS total_revenue,
+	CAST(SUM(total_price)*100/
+		(SELECT SUM(total_price) FROM [pizza_sales excel file])  AS decimal (10,2))  AS PCT 
+FROM [pizza_sales excel file]
+GROUP BY pizza_size
+ORDER BY pizza_size
+
+--percentage of revenue for each pizza size for 1st quater
+SELECT pizza_size, 
+	CAST(SUM(total_price) AS decimal(10,2)) AS total_revenue,
+	CAST(SUM(total_price)*100/
+		(SELECT SUM(total_price) FROM [pizza_sales excel file] WHERE DATEPART(quarter, order_date) = 1 ) AS decimal (10,2))  AS PCT 
+FROM [pizza_sales excel file]
+WHERE DATEPART(quarter, order_date) = 1
+GROUP BY pizza_size
+ORDER BY pizza_size
+
+--Total Pizzas Sold by Pizza Category
+SELECT pizza_category,
+	SUM(quantity) AS Total_Quantity_Sold
+FROM [pizza_sales excel file]
+GROUP BY pizza_category
+ORDER BY SUM(quantity) DESC
+
+--Total Pizzas Sold by Pizza Category for February
+SELECT pizza_category,
+	SUM(quantity) AS Total_Quantity_Sold
+FROM [pizza_sales excel file]
+WHERE MONTH(order_date) = 2  --only stated once because there is no subquery
+GROUP BY pizza_category
+ORDER BY SUM(quantity) DESC
+
+--Top 5 Best Sellers by Total Pizzas Sold
+SELECT TOP 5 pizza_name,
+	SUM(quantity) AS Total_Quantity_Sold
+FROM [pizza_sales excel file]
+GROUP BY pizza_name
+ORDER BY SUM(quantity) DESC
+
+--Bottom 5 Best Sellers by Total Pizzas Sold
+SELECT TOP 5 pizza_name,
+	SUM(quantity) AS Total_Quantity_Sold
+FROM [pizza_sales excel file]
+GROUP BY pizza_name
+ORDER BY SUM(quantity) ASC
+
